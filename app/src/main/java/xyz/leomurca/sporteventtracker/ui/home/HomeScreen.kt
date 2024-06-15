@@ -1,6 +1,7 @@
 package xyz.leomurca.sporteventtracker.ui.home
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -64,13 +66,15 @@ private fun ExpandableSportItem(sport: Sport) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(top = 20.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(Modifier.weight(1F)) {
+            Row(Modifier.weight(1F).padding(start = 6.dp)) {
                 Icon(
                     imageVector = Icons.Filled.Info,
                     contentDescription = null,
@@ -85,6 +89,12 @@ private fun ExpandableSportItem(sport: Sport) {
 
             Switch(
                 checked = true,
+                colors = SwitchDefaults.colors().copy(
+                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                    checkedIconColor = MaterialTheme.colorScheme.tertiary,
+                    uncheckedIconColor = Color.White,
+                    uncheckedThumbColor = Color.Gray
+                ),
                 thumbContent = {
                     Icon(
                         imageVector = Icons.Filled.Star,
@@ -102,8 +112,9 @@ private fun ExpandableSportItem(sport: Sport) {
         }
 
         if (isExpanded) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Column {
+            Column(
+                Modifier.fillMaxWidth()
+            ) {
                 sport.activeEvents.map {
                     ActiveSportEventItem(activeSportEvent = it)
                 }
@@ -125,6 +136,7 @@ private fun ExpandableChevronIcon(isExpanded: Boolean, onClick: () -> Unit) {
                 contentDescription = null,
                 modifier = Modifier
                     .size(40.dp)
+                    .padding(end = 6.dp)
                     .rotate(rotation)
             )
         }
@@ -136,6 +148,7 @@ private fun ActiveSportEventItem(activeSportEvent: SportEvent) {
     Text(
         text = activeSportEvent.name,
         style = MaterialTheme.typography.bodyMedium,
-        color = Color.Gray
+        color = Color.Gray,
+        modifier = Modifier.padding(top = 8.dp)
     )
 }
