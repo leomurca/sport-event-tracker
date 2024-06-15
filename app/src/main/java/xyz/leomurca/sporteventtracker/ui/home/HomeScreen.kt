@@ -12,12 +12,16 @@ fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier) {
     val state = viewModel.uiState.collectAsState()
 
     when (val value = state.value) {
-        is HomeViewModel.UiState.Loaded -> {
+        is HomeViewModel.UiState.Loaded.Success -> {
             LazyColumn(modifier) {
                 items(value.sports) {
                     Text(text = it.name)
                 }
             }
+        }
+
+        is HomeViewModel.UiState.Loaded.Error -> {
+            Text(text = value.message)
         }
 
         is HomeViewModel.UiState.Loading -> {
