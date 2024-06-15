@@ -1,5 +1,6 @@
 package xyz.leomurca.sporteventtracker.ui.home
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -74,6 +75,7 @@ private fun ExpandableSportItem(sport: Sport) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .animateContentSize()
             .padding(top = 20.dp),
     ) {
         Row(
