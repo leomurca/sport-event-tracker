@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import xyz.leomurca.sporteventtracker.data.model.Sport
 import xyz.leomurca.sporteventtracker.data.model.SportEvent
+import xyz.leomurca.sporteventtracker.ui.extension.shimmerEffect
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier) {
@@ -63,7 +65,14 @@ fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier) {
         }
 
         is HomeViewModel.UiState.Loading -> {
-            Text("Loading...")
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxSize()
+            ) {
+                items(7) {
+                    LoadingPlaceholder()
+                }
+            }
         }
     }
 }
@@ -221,5 +230,17 @@ private fun ActiveSportEventItem(activeSportEvent: SportEvent, modifier: Modifie
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun LoadingPlaceholder() {
+    Row(Modifier.padding(top = 15.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .shimmerEffect()
+        )
     }
 }
