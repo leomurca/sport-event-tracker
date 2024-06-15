@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SportEventTrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(top = it.calculateTopPadding()))
+                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(it))
                 }
             }
         }

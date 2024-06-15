@@ -21,7 +21,8 @@ private val LightColorScheme = lightColorScheme(
     secondary = FlameOrange,
     tertiary = ElectricBlue,
     background = DarkGray,
-    surface = White
+    surface = White,
+    inversePrimary = Black
 )
 
 @Composable
