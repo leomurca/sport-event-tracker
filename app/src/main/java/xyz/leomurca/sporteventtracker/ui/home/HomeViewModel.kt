@@ -21,7 +21,7 @@ class HomeViewModel @Inject constructor(
         sportEventsRepository.fetchSports().map {
             when (it) {
                 is SportResult.Success -> UiState.Loaded.Success(it.data)
-                is SportResult.Error -> UiState.Loaded.Error("Something went wrong!")
+                is SportResult.Error -> UiState.Loaded.Error(it.message)
             }
         }.stateIn(
             scope = viewModelScope,

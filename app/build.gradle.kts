@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -20,6 +21,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "API_BASE_URL", "\"https://618d3aa7fe09aa001744060a.mockapi.io/api/\"")
     }
 
     buildTypes {
@@ -37,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -58,6 +62,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.hilt.android)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.okhttp3.okhttp)
     kapt(libs.hilt.compiler)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
