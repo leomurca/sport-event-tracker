@@ -2,6 +2,9 @@ package xyz.leomurca.sporteventtracker.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.Instant
 import xyz.leomurca.sporteventtracker.data.model.Sport
 import xyz.leomurca.sporteventtracker.data.model.SportEvent
 import xyz.leomurca.sporteventtracker.data.model.SportResult
@@ -25,7 +28,7 @@ class DefaultSportEventsRepository @Inject constructor(
                                     id = event.eventId,
                                     sportId = event.sportId,
                                     competitors = event.eventName.split("-").zipWithNext().first(),
-                                    startTime = event.eventStartTime.toString(),
+                                    remainingSecondsToStart = remainingSecondsToStart(event.eventStartTime)
                                 )
                             }
                         )
@@ -37,5 +40,18 @@ class DefaultSportEventsRepository @Inject constructor(
                 SportResult.Error(result.exception.message)
             )
         }
+    }
+
+    private fun remainingSecondsToStart(eventStartTime: Int): Int {
+        val startTimeSeconds = eventStartTime.toLong()
+        val startTimeEpochSeconds = ZonedDateTime.ofInstant(
+            Instant.ofEpochSecond(startTimeSeconds),
+            ZoneOffset.systemDefault()
+        ).toEpochSecond()
+
+        val currentTimeEpochSeconds = ZonedDateTime.now(ZoneOffset.systemDefault()).toEpochSecond()
+        val differenceInSeconds = (startTimeEpochSeconds - currentTimeEpochSeconds).toInt()
+
+        return differenceInSeconds
     }
 }

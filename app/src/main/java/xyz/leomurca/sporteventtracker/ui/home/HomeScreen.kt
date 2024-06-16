@@ -31,8 +31,11 @@ import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.Flow
 import xyz.leomurca.sporteventtracker.R
 import xyz.leomurca.sporteventtracker.data.model.Sport
 import xyz.leomurca.sporteventtracker.data.model.SportEvent
@@ -57,13 +61,14 @@ fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier) {
     when (val value = state.value) {
         is HomeViewModel.UiState.Loaded.Success -> {
             LazyColumn(modifier) {
-                items(value.sports) {
+                items(value.sports) { sport ->
                     ExpandableSportItem(
-                        sport = it,
-                        isSwitchActive = activeSportSwitchesIds.value.contains(it.id),
+                        sport = sport,
+                        isSwitchActive = activeSportSwitchesIds.value.contains(sport.id),
                         onAddEventToFavorites = { id -> viewModel.addFavorite(id) },
                         onRemoveEventFromFavorites = { event -> viewModel.removeFavorite(event) },
-                        onFilterFavorites = { sportId, shouldFilter -> viewModel.filterFavorites(sportId, shouldFilter) }
+                        onFilterFavorites = { sportId, shouldFilter -> viewModel.filterFavorites(sportId, shouldFilter) },
+                        onStartCountDown = { startTime -> viewModel.startCountdown(startTime) }
                     )
                 }
             }
@@ -92,7 +97,8 @@ private fun ExpandableSportItem(
     isSwitchActive: Boolean,
     onAddEventToFavorites: (eventId: String) -> Unit,
     onRemoveEventFromFavorites: (event: SportEvent) -> Unit,
-    onFilterFavorites: (sportId: String, shouldFilter: Boolean) -> Unit
+    onFilterFavorites: (sportId: String, shouldFilter: Boolean) -> Unit,
+    onStartCountDown: (startTime: Int) -> Flow<Int>
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     var favoriteSwitchState by rememberSaveable { mutableStateOf(isSwitchActive) }
@@ -148,8 +154,16 @@ private fun ExpandableSportItem(
         }
 
         if (isExpanded) {
-            if (sport.activeEvents.isNotEmpty()) TwoColumnSportEventsGrid(items = sport.activeEvents, onAddEventToFavorites = onAddEventToFavorites, onRemoveEventFromFavorites = onRemoveEventFromFavorites)
-            else NoActiveEventsPlaceholder()
+            if (sport.activeEvents.isNotEmpty()) {
+                TwoColumnSportEventsGrid(
+                    items = sport.activeEvents,
+                    onAddEventToFavorites = onAddEventToFavorites,
+                    onRemoveEventFromFavorites = onRemoveEventFromFavorites,
+                    onStartCountDown = onStartCountDown
+                )
+            } else {
+                NoActiveEventsPlaceholder()
+            }
         }
     }
 }
@@ -159,6 +173,7 @@ fun TwoColumnSportEventsGrid(
     items: List<SportEvent>,
     onAddEventToFavorites: (eventId: String) -> Unit,
     onRemoveEventFromFavorites: (event: SportEvent) -> Unit,
+    onStartCountDown: (startTime: Int) -> Flow<Int>
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         for (i in items.indices step 2) {
@@ -167,11 +182,23 @@ fun TwoColumnSportEventsGrid(
                 val item2 = items.getOrNull(i + 1)
 
                 item1?.let {
-                    ActiveSportEventItem(activeSportEvent = it, onAddEventToFavorites = onAddEventToFavorites, onRemoveEventFromFavorites = onRemoveEventFromFavorites, modifier = Modifier.weight(1f))
+                    ActiveSportEventItem(
+                        activeSportEvent = it,
+                        onAddEventToFavorites = onAddEventToFavorites,
+                        onRemoveEventFromFavorites = onRemoveEventFromFavorites,
+                        onStartCountDown = onStartCountDown,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 item2?.let {
-                    ActiveSportEventItem(activeSportEvent = it, onAddEventToFavorites = onAddEventToFavorites, onRemoveEventFromFavorites = onRemoveEventFromFavorites, modifier = Modifier.weight(1f))
+                    ActiveSportEventItem(
+                        activeSportEvent = it,
+                        onAddEventToFavorites = onAddEventToFavorites,
+                        onRemoveEventFromFavorites = onRemoveEventFromFavorites,
+                        onStartCountDown = onStartCountDown,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 if (item2==null) {
@@ -208,8 +235,16 @@ private fun ActiveSportEventItem(
     activeSportEvent: SportEvent,
     onAddEventToFavorites: (eventId: String) -> Unit,
     onRemoveEventFromFavorites: (event: SportEvent) -> Unit,
+    onStartCountDown: (startTime: Int) -> Flow<Int>,
     modifier: Modifier
 ) {
+    var countdownSeconds by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(key1 = true) {
+        onStartCountDown(activeSportEvent.remainingSecondsToStart).collect {
+            countdownSeconds = it
+        }
+    }
     Card(
         shape = RectangleShape,
         colors = CardDefaults.cardColors().copy(
@@ -227,7 +262,7 @@ private fun ActiveSportEventItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = activeSportEvent.startTime,
+                text = formatTime(totalSeconds = countdownSeconds),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.inversePrimary,
@@ -310,4 +345,11 @@ private fun FilledCircleIcon() {
         tint = MaterialTheme.colorScheme.secondary,
         modifier = Modifier.size(25.dp)
     )
+}
+
+private fun formatTime(totalSeconds: Int): String {
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+    return "%02dh:%02dm:%02ds".format(hours, minutes, seconds)
 }

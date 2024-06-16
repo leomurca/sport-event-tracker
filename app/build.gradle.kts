@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.okhttp3.okhttp)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.jakewharton.threetenabp)
 
     annotationProcessor(libs.androidx.room.compiler)
 

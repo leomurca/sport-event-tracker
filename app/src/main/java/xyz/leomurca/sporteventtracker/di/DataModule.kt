@@ -11,6 +11,7 @@ import xyz.leomurca.sporteventtracker.data.AppDatabase
 import xyz.leomurca.sporteventtracker.data.dao.FavoriteIdDao
 import xyz.leomurca.sporteventtracker.data.repository.DefaultFavoriteRepository
 import xyz.leomurca.sporteventtracker.data.repository.DefaultSportEventsRepository
+import xyz.leomurca.sporteventtracker.data.repository.FakeSportEventsRepository
 import xyz.leomurca.sporteventtracker.data.repository.FavoriteRepository
 import xyz.leomurca.sporteventtracker.data.repository.SportEventsRepository
 import xyz.leomurca.sporteventtracker.network.NetworkDataSource
