@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -41,9 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import xyz.leomurca.sporteventtracker.R
 import xyz.leomurca.sporteventtracker.data.model.Sport
 import xyz.leomurca.sporteventtracker.data.model.SportEvent
 import xyz.leomurca.sporteventtracker.ui.extension.shimmerEffect
@@ -111,11 +112,7 @@ private fun ExpandableSportItem(
             Row(Modifier
                 .weight(1F)
                 .padding(start = 6.dp)) {
-                Icon(
-                    imageVector = Icons.Filled.Info,
-                    contentDescription = null,
-                    modifier = Modifier.size(25.dp)
-                )
+                FilledCircleIcon()
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = sport.name,
@@ -303,4 +300,14 @@ private fun NoActiveEventsPlaceholder() {
             color = MaterialTheme.colorScheme.primary,
         )
     }
+}
+
+@Composable
+private fun FilledCircleIcon() {
+    Icon(
+        painter = painterResource(id = R.drawable.ic_circle_filled),
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.secondary,
+        modifier = Modifier.size(25.dp)
+    )
 }
