@@ -1,7 +1,6 @@
 package xyz.leomurca.sporteventtracker.ui.home
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,13 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -40,17 +37,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
-import xyz.leomurca.sporteventtracker.R
 import xyz.leomurca.sporteventtracker.data.model.Sport
 import xyz.leomurca.sporteventtracker.data.model.SportEvent
+import xyz.leomurca.sporteventtracker.ui.components.ExpandableChevronIconToggleButton
+import xyz.leomurca.sporteventtracker.ui.components.FilledCircleIcon
 import xyz.leomurca.sporteventtracker.ui.extension.shimmerEffect
 
 @Composable
@@ -125,7 +121,6 @@ private fun ExpandableSportItem(
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
-
             Switch(
                 checked = favoriteSwitchState,
                 colors = SwitchDefaults.colors().copy(
@@ -147,7 +142,7 @@ private fun ExpandableSportItem(
                 }
             )
 
-            ExpandableChevronIcon(
+            ExpandableChevronIconToggleButton(
                 isExpanded = isExpanded,
                 onClick = { isExpanded = !isExpanded }
             )
@@ -169,7 +164,7 @@ private fun ExpandableSportItem(
 }
 
 @Composable
-fun TwoColumnSportEventsGrid(
+private fun TwoColumnSportEventsGrid(
     items: List<SportEvent>,
     onAddEventToFavorites: (eventId: String) -> Unit,
     onRemoveEventFromFavorites: (event: SportEvent) -> Unit,
@@ -208,26 +203,6 @@ fun TwoColumnSportEventsGrid(
             Spacer(modifier = Modifier.height(8.dp)) // Space between rows
         }
     }
-}
-
-@Composable
-private fun ExpandableChevronIcon(isExpanded: Boolean, onClick: () -> Unit) {
-    val rotation by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "")
-
-    IconToggleButton(
-        checked = isExpanded,
-        onCheckedChange = { onClick() },
-        content = {
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowDown,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 6.dp)
-                    .rotate(rotation)
-            )
-        }
-    )
 }
 
 @Composable
@@ -335,16 +310,6 @@ private fun NoActiveEventsPlaceholder() {
             color = MaterialTheme.colorScheme.primary,
         )
     }
-}
-
-@Composable
-private fun FilledCircleIcon() {
-    Icon(
-        painter = painterResource(id = R.drawable.ic_circle_filled),
-        contentDescription = null,
-        tint = MaterialTheme.colorScheme.secondary,
-        modifier = Modifier.size(25.dp)
-    )
 }
 
 private fun formatTime(totalSeconds: Int): String {
