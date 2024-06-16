@@ -133,7 +133,8 @@ private fun ExpandableSportItem(sport: Sport) {
         }
 
         if (isExpanded) {
-            TwoColumnSportEventsGrid(items = sport.activeEvents)
+            if (sport.activeEvents.isNotEmpty()) TwoColumnSportEventsGrid(items = sport.activeEvents)
+            else NoActiveEventsPlaceholder()
         }
     }
 }
@@ -241,6 +242,26 @@ private fun LoadingPlaceholder() {
                 .fillMaxWidth()
                 .height(40.dp)
                 .shimmerEffect()
+        )
+    }
+}
+
+@Composable
+private fun NoActiveEventsPlaceholder() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp)
+            .animateContentSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+
+        Text(
+            text = "There is no active events!",
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
