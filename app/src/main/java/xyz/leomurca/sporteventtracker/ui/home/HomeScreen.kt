@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -50,12 +51,19 @@ import xyz.leomurca.sporteventtracker.ui.extension.shimmerEffect
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier) {
     val state = viewModel.uiState.collectAsState()
+    val activeSportSwitchesIds = viewModel.activeSportSwitchesIds.collectAsState()
 
     when (val value = state.value) {
         is HomeViewModel.UiState.Loaded.Success -> {
             LazyColumn(modifier) {
                 items(value.sports) {
-                    ExpandableSportItem(sport = it)
+                    ExpandableSportItem(
+                        sport = it,
+                        isSwitchActive = activeSportSwitchesIds.value.contains(it.id),
+                        onAddEventToFavorites = { id -> viewModel.addFavorite(id) },
+                        onRemoveEventFromFavorites = { event -> viewModel.removeFavorite(event) },
+                        onFilterFavorites = { sportId, shouldFilter -> viewModel.filterFavorites(sportId, shouldFilter) }
+                    )
                 }
             }
         }
@@ -78,8 +86,15 @@ fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier) {
 }
 
 @Composable
-private fun ExpandableSportItem(sport: Sport) {
+private fun ExpandableSportItem(
+    sport: Sport,
+    isSwitchActive: Boolean,
+    onAddEventToFavorites: (eventId: String) -> Unit,
+    onRemoveEventFromFavorites: (event: SportEvent) -> Unit,
+    onFilterFavorites: (sportId: String, shouldFilter: Boolean) -> Unit
+) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
+    var favoriteSwitchState by rememberSaveable { mutableStateOf(isSwitchActive) }
 
     Column(
         modifier = Modifier
@@ -109,7 +124,7 @@ private fun ExpandableSportItem(sport: Sport) {
             }
 
             Switch(
-                checked = true,
+                checked = favoriteSwitchState,
                 colors = SwitchDefaults.colors().copy(
                     checkedTrackColor = MaterialTheme.colorScheme.primary,
                     checkedIconColor = MaterialTheme.colorScheme.tertiary,
@@ -123,7 +138,10 @@ private fun ExpandableSportItem(sport: Sport) {
                         modifier = Modifier.size(20.dp)
                     )
                 },
-                onCheckedChange = {}
+                onCheckedChange = {
+                    favoriteSwitchState = !favoriteSwitchState
+                    onFilterFavorites.invoke(sport.id, favoriteSwitchState)
+                }
             )
 
             ExpandableChevronIcon(
@@ -133,14 +151,18 @@ private fun ExpandableSportItem(sport: Sport) {
         }
 
         if (isExpanded) {
-            if (sport.activeEvents.isNotEmpty()) TwoColumnSportEventsGrid(items = sport.activeEvents)
+            if (sport.activeEvents.isNotEmpty()) TwoColumnSportEventsGrid(items = sport.activeEvents, onAddEventToFavorites = onAddEventToFavorites, onRemoveEventFromFavorites = onRemoveEventFromFavorites)
             else NoActiveEventsPlaceholder()
         }
     }
 }
 
 @Composable
-fun TwoColumnSportEventsGrid(items: List<SportEvent>) {
+fun TwoColumnSportEventsGrid(
+    items: List<SportEvent>,
+    onAddEventToFavorites: (eventId: String) -> Unit,
+    onRemoveEventFromFavorites: (event: SportEvent) -> Unit,
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         for (i in items.indices step 2) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -148,11 +170,11 @@ fun TwoColumnSportEventsGrid(items: List<SportEvent>) {
                 val item2 = items.getOrNull(i + 1)
 
                 item1?.let {
-                    ActiveSportEventItem(activeSportEvent = it, modifier = Modifier.weight(1f))
+                    ActiveSportEventItem(activeSportEvent = it, onAddEventToFavorites = onAddEventToFavorites, onRemoveEventFromFavorites = onRemoveEventFromFavorites, modifier = Modifier.weight(1f))
                 }
 
                 item2?.let {
-                    ActiveSportEventItem(activeSportEvent = it, modifier = Modifier.weight(1f))
+                    ActiveSportEventItem(activeSportEvent = it, onAddEventToFavorites = onAddEventToFavorites, onRemoveEventFromFavorites = onRemoveEventFromFavorites, modifier = Modifier.weight(1f))
                 }
 
                 if (item2==null) {
@@ -185,7 +207,12 @@ private fun ExpandableChevronIcon(isExpanded: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun ActiveSportEventItem(activeSportEvent: SportEvent, modifier: Modifier) {
+private fun ActiveSportEventItem(
+    activeSportEvent: SportEvent,
+    onAddEventToFavorites: (eventId: String) -> Unit,
+    onRemoveEventFromFavorites: (event: SportEvent) -> Unit,
+    modifier: Modifier
+) {
     Card(
         shape = RectangleShape,
         colors = CardDefaults.cardColors().copy(
@@ -230,6 +257,18 @@ private fun ActiveSportEventItem(activeSportEvent: SportEvent, modifier: Modifie
                 color = MaterialTheme.colorScheme.inversePrimary,
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp)
             )
+
+            IconButton(onClick = {
+                if (activeSportEvent.isFavorite) onRemoveEventFromFavorites.invoke(activeSportEvent)
+                else onAddEventToFavorites.invoke(activeSportEvent.id)
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    tint = if (activeSportEvent.isFavorite) MaterialTheme.colorScheme.primary else Color.Gray,
+                    contentDescription = null,
+                    modifier = Modifier.size(25.dp)
+                )
+            }
         }
     }
 }

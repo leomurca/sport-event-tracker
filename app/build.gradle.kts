@@ -66,7 +66,13 @@ dependencies {
     implementation(libs.retrofit.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit2.retrofit)
     implementation(libs.okhttp3.okhttp)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+
+    annotationProcessor(libs.androidx.room.compiler)
+
     kapt(libs.hilt.compiler)
+    kapt(libs.androidx.room.compiler)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.espresso.core)

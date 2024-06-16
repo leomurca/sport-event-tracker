@@ -10,7 +10,7 @@ import xyz.leomurca.sporteventtracker.network.NetworkResult
 import javax.inject.Inject
 
 class DefaultSportEventsRepository @Inject constructor(
-    private val dataSource: NetworkDataSource
+    private val dataSource: NetworkDataSource,
 ) : SportEventsRepository {
     override fun fetchSports(): Flow<SportResult<List<Sport>>> = flow {
         when (val result = dataSource.fetchSports()) {
@@ -25,7 +25,7 @@ class DefaultSportEventsRepository @Inject constructor(
                                     id = event.eventId,
                                     sportId = event.sportId,
                                     competitors = event.eventName.split("-").zipWithNext().first(),
-                                    startTime = event.eventStartTime.toString()
+                                    startTime = event.eventStartTime.toString(),
                                 )
                             }
                         )
