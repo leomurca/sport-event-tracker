@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
 fun CustomTopAppBar() {
     Row(
         modifier = Modifier
-            .height(80.dp)
+            .height(70.dp)
             .padding(0.dp)
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.tertiary),
@@ -64,8 +64,9 @@ fun CustomTopAppBar() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo_sportstracker), // Replace with your logo resource ID
+            painter = painterResource(id = R.drawable.logo_sportstracker),
             contentDescription = "Logo",
+            modifier = Modifier.padding(vertical = 4.dp)
         )
     }
 }
