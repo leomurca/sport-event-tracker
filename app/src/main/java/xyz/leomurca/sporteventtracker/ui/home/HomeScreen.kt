@@ -215,9 +215,11 @@ private fun ActiveSportEventItem(
 ) {
     var countdownSeconds by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(key1 = true) {
-        onStartCountDown(activeSportEvent.remainingSecondsToStart).collect {
-            countdownSeconds = it
+    if (activeSportEvent.remainingSecondsToStart > 0) {
+        LaunchedEffect(key1 = true) {
+            onStartCountDown(activeSportEvent.remainingSecondsToStart).collect {
+                countdownSeconds = it
+            }
         }
     }
     Card(
@@ -313,6 +315,7 @@ private fun NoActiveEventsPlaceholder() {
 }
 
 private fun formatTime(totalSeconds: Int): String {
+    if (totalSeconds == 0) return "00h:00m:00s"
     val hours = totalSeconds / 3600
     val minutes = (totalSeconds % 3600) / 60
     val seconds = totalSeconds % 60
