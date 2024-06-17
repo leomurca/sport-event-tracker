@@ -14,6 +14,8 @@ import xyz.leomurca.sporteventtracker.data.repository.DefaultSportEventsReposito
 import xyz.leomurca.sporteventtracker.data.repository.FakeSportEventsRepository
 import xyz.leomurca.sporteventtracker.data.repository.FavoriteRepository
 import xyz.leomurca.sporteventtracker.data.repository.SportEventsRepository
+import xyz.leomurca.sporteventtracker.data.util.DefaultSportEventTimeManager
+import xyz.leomurca.sporteventtracker.data.util.SportEventTimeManager
 import xyz.leomurca.sporteventtracker.network.NetworkDataSource
 import javax.inject.Singleton
 
@@ -38,11 +40,15 @@ class DataModule {
 
     @Provides
     fun providesSportEventsRepository(
-        dataSource: NetworkDataSource
-    ): SportEventsRepository = DefaultSportEventsRepository(dataSource)
+        dataSource: NetworkDataSource,
+        sportEventTimeManager: SportEventTimeManager
+    ): SportEventsRepository = DefaultSportEventsRepository(dataSource, sportEventTimeManager)
 
     @Provides
     fun providesFavoriteRepository(
         appDatabase: AppDatabase
     ): FavoriteRepository = DefaultFavoriteRepository(appDatabase.favoriteIdDao())
+
+    @Provides
+    fun providesSportEventTimeManager(): SportEventTimeManager = DefaultSportEventTimeManager()
 }

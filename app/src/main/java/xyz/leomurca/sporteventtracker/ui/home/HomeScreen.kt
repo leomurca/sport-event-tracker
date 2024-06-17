@@ -47,6 +47,7 @@ import xyz.leomurca.sporteventtracker.data.model.Sport
 import xyz.leomurca.sporteventtracker.data.model.SportEvent
 import xyz.leomurca.sporteventtracker.ui.components.ExpandableChevronIconToggleButton
 import xyz.leomurca.sporteventtracker.ui.components.FilledCircleIcon
+import xyz.leomurca.sporteventtracker.ui.extension.formatRemainingSeconds
 import xyz.leomurca.sporteventtracker.ui.extension.shimmerEffect
 
 @Composable
@@ -239,7 +240,7 @@ private fun ActiveSportEventItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = formatTime(totalSeconds = countdownSeconds),
+                text = countdownSeconds.formatRemainingSeconds(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.inversePrimary,
@@ -312,12 +313,4 @@ private fun NoActiveEventsPlaceholder() {
             color = MaterialTheme.colorScheme.primary,
         )
     }
-}
-
-private fun formatTime(totalSeconds: Int): String {
-    if (totalSeconds == 0) return "00h:00m:00s"
-    val hours = totalSeconds / 3600
-    val minutes = (totalSeconds % 3600) / 60
-    val seconds = totalSeconds % 60
-    return "%02dh:%02dm:%02ds".format(hours, minutes, seconds)
 }
