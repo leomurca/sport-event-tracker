@@ -3,4 +3,4 @@
 A simple android app that lists upcoming sports events.
 
 ## Demo
-![Watch the demo video](./demo.mp4)
+![Watch the demo video](./demo.gif)
