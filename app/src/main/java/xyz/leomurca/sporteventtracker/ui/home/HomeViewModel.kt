@@ -3,20 +3,11 @@ package xyz.leomurca.sporteventtracker.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import xyz.leomurca.sporteventtracker.data.model.Sport
 import xyz.leomurca.sporteventtracker.data.model.SportEvent
@@ -28,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val sportEventsRepository: SportEventsRepository,
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val countdownTimer: CountdownTimer
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
@@ -37,23 +29,11 @@ class HomeViewModel @Inject constructor(
     private val _activeSportSwitchesIds = MutableStateFlow<List<String>>(emptyList())
     val activeSportSwitchesIds = _activeSportSwitchesIds.asStateFlow()
 
-    private var countdownJob: Job? = null
-    fun startCountdown(totalSeconds: Int): Flow<Int> = flow {
-        var remainingSeconds = totalSeconds
-        while (remainingSeconds >= 0 && currentCoroutineContext().isActive) {
-            emit(remainingSeconds)
-            delay(1000)
-            remainingSeconds--
-        }
-    }.onStart {
-        emit(totalSeconds)
-    }.onCompletion {
-        countdownJob?.cancel()
-    }.flowOn(Dispatchers.Default)
+    fun startCountdown(totalSeconds: Int): Flow<Int> = countdownTimer.startCountdown(totalSeconds)
 
     override fun onCleared() {
         super.onCleared()
-        countdownJob?.cancel()
+        countdownTimer.cancelCountdown()
     }
 
     init {
